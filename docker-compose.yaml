@@ -1,0 +1,34 @@
+services:
+  example-db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 9432:5432
+    # Use an example database to create some initial tables and data
+    volumes:
+      - ${PWD}/dumps/world.sql:/docker-entrypoint-initdb.d/init.sql
+  pg_dumper:
+    image: pg_dumper:latest
+    depends_on:
+      - example-db
+    environment:
+      # To configure pg_dumper
+      - PORT=9999
+      - DIR=/dumps/
+      # And below are the environment variables for pg_dump, pg_restore and psql themselves
+      - PGHOST=example-db
+      - PGPORT=5432
+      - PGUSER=postgres
+      - PGPASSWORD=postgres
+      - PGDATABASE=postgres
+    ports:
+      - 9999:9999
+    volumes:
+      - ${PWD}/dumps/:/dumps/
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -v --fail http://localhost:$${PORT:-8090}/ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
