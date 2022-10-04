@@ -21,11 +21,11 @@ Then, in a different terminal window:
 
 ### List all dumps
 
-_Response should be empty initially._
-
 `curl "localhost:9999/list"`
 
-### Dump the current database
+_The response should be empty initially (since no dump was made yet)._
+
+### Dump the current database state
 
 `curl "localhost:9999/dump?name=some-state"`
 
