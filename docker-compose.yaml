@@ -28,7 +28,7 @@ services:
     volumes:
       - ${PWD}/dumps/:/dumps/
     healthcheck:
-      test: [ "CMD-SHELL", "curl -v --fail http://localhost:$${PORT:-8090}/ping" ]
+      test: [ "CMD-SHELL", "curl -v --fail http://localhost:$${PORT:-8090}/health" ]
       interval: 1s
       timeout: 3s
       retries: 30

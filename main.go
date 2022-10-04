@@ -23,10 +23,10 @@ var config *Config
 func main() {
 	http.HandleFunc("/list", listDumps)
 	http.HandleFunc("/dump", createDump)
-	http.HandleFunc("/restore", restore)
+	http.HandleFunc("/restore", restoreDump)
 	http.HandleFunc("/delete", deleteDump)
 	http.HandleFunc("/download", downloadDump)
-	http.HandleFunc("/ping", ping)
+	http.HandleFunc("/health", health)
 	config = readConfig()
 	addr := fmt.Sprintf("%s:%s", config.host, config.port)
 	log.Printf("Starting (binding to '%s', config = %+v) \n", addr, config)
@@ -66,7 +66,7 @@ func createDump(w http.ResponseWriter, req *http.Request) {
 	executeCommand("pg_dump", args, w)
 }
 
-func restore(w http.ResponseWriter, req *http.Request) {
+func restoreDump(w http.ResponseWriter, req *http.Request) {
 	name, err := getParamValueFromRequestExpectingItToExist("name", req)
 	if err != nil {
 		errMsg := fmt.Sprintf("%s", err)
@@ -163,7 +163,7 @@ func getAbsolutePathForDumpName(name string) string {
 }
 
 // Can be used to see if the application responds and can connect to the database (e.g. a health check)
-func ping(w http.ResponseWriter, _ *http.Request) {
+func health(w http.ResponseWriter, _ *http.Request) {
 	versionBytes, err := exec.Command("pg_dump", "--version").Output()
 	if err != nil {
 		errMsg := fmt.Sprintf("Error while getting version of pg_dump %s", err)
@@ -178,7 +178,7 @@ func ping(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	_, _ = fmt.Fprintln(w, "pong!")
+	_, _ = fmt.Fprintln(w, "OK")
 	fmt.Fprintf(w, "pg_dump version: %v", string(versionBytes))
 	fmt.Fprintf(w, "pg_isready: %v", string(isReadyBytes))
 }
