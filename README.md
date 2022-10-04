@@ -19,18 +19,40 @@ _Hint: use `docker-compose down --volumes` to clean up any data that might exist
 
 Then, in a different terminal window:
 
-### List all known dumps (should be empty)
+### List all dumps
 
-`curl -v "localhost:9999/list"`
+_Response should be empty initially._
+
+`curl "localhost:9999/list"`
 
 ### Dump the current database
 
-`curl -v "localhost:9999/dump?name=some-state"`
+`curl "localhost:9999/dump?name=some-state"`
 
-### List again (should contain the dump that was just created)
+_The response should look something like this:_
 
-`curl -v "localhost:9999/list"`
+```
+SUCCESS
+Succesfully executed pg_dump with arguments: [--clean --format=plain -f /dumps/some-state.dump.sql]):
+```
+
+### List again
+
+`curl "localhost:9999/list"`
+
+_The response should now contain the dump that was just created, in the previous step. E.g.:_
+
+```
+some-state (/dumps/some-state.dump.sql @ 2022-10-04 12:33:27.316599119 +0000 UTC)
+```
 
 ### Restore an earlier made dump
 
-`curl -v "localhost:9999/restore?name=some-state"`
+`curl "localhost:9999/restore?name=some-state"`
+
+_The response should look something like this:_
+
+```
+SUCCESS
+Succesfully executed psql with arguments: [-f /dumps/some-state.dump.sql]):
+```
